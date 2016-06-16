@@ -1,5 +1,7 @@
 package spark;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
@@ -44,6 +46,8 @@ public abstract class SparkBase {
     private static boolean servletExternalStaticLocationSet;
 
     private static CountDownLatch latch = new CountDownLatch(1);
+
+    private static TemplateEngine _templateEngine;
 
     /**
      * Set the IP address that Spark should listen on. If not called the default
@@ -384,4 +388,24 @@ public abstract class SparkBase {
         }
     }
 
+    public static TemplateArg arg( String name, Object val )
+    {
+        return new TemplateArg( name, val );
+    }
+
+    public static String renderTemplate( String template, TemplateArg... args ) {
+        Map attributes = new HashMap<>();
+        for( int i = 0; i < args.length; i++ )
+        {
+            TemplateArg arg = args[i];
+            attributes.put( arg.getName(), arg.getVal() );
+        }
+        ModelAndView modelAndView = new ModelAndView( attributes, template );
+        return _templateEngine.render( modelAndView );
+    }
+
+    public static void setTemplateEngine( TemplateEngine templateEngine )
+    {
+        _templateEngine = templateEngine;
+    }
 }
